@@ -4,6 +4,58 @@
 #include "../libft/headers/libft.h"
 #include <sys/wait.h>
 
+int	main(int argc, char **argv, char **envp)
+{
+	(void)argc;
+	(void)argv;
+	int	i;
+	int	id;
+	char	**path;
+	char	**path2;
+
+	execve(argv[1], &argv[1], envp);
+	i = 0;
+	while (!(envp[i][0] == 'P' && envp[i][1] == 'A'))
+		i++;
+	path = ft_split(&envp[i][5], ':');
+	i = 0;
+	while (path[i] != NULL)
+		i++;
+	path2 = malloc(sizeof(char *) * (i + 1));
+	path2[i] = NULL;
+	i -= 1;
+	while (i >= 0)
+	{
+		path2[i] = malloc(sizeof(char) * (ft_strlen(path[i]) + ft_strlen(argv[1]) + 3));
+		path2[i][0] = '\0';
+		ft_strcat(path2[i], path[i]);
+		ft_strcat(path2[i], "/");
+		ft_strcat(path2[i], argv[1]);
+		i--;
+	}
+	i = 0;
+	while (access(path2[i], F_OK|X_OK) == -1)
+		i++;
+	id = fork();
+	if (id == 0)
+		execve(path2[i], &argv[1], envp);
+	else
+	{
+		wait(NULL);
+		i = 0;
+		while (path[i] != NULL)
+		{
+			free(path[i]);
+			free(path2[i]);
+			i++;
+		}
+		free(path);
+		free(path2);
+	}
+	return (0);
+}
+
+/*
 int	main(void)
 {
 	int	fd[2];
@@ -52,7 +104,6 @@ int	main(void)
 	return (1);
 }
 
-/*
 int	main(int argc, char **argv)
 {
 	(void)argc;
