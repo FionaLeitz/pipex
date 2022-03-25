@@ -4,54 +4,111 @@
 #include "../libft/headers/libft.h"
 #include <sys/wait.h>
 
-int	main(int argc, char **argv, char **envp)
+char	*free_split(char **str)
 {
-	(void)argc;
-	(void)argv;
 	int	i;
-	int	id;
-	char	**path;
-	char	**path2;
 
-	execve(argv[1], &argv[1], envp);
 	i = 0;
-	while (!(envp[i][0] == 'P' && envp[i][1] == 'A'))
+	while (str[i])
+	{
+		free(str[i]);
+		i++;
+	}
+	free(str);
+	return (NULL);
+}
+
+char	*get_path(char **arg, char **envp)
+{
+
+	int	i;
+	char **path;
+	char **path2;
+	char *cmd;
+
+	execve(arg[0], arg, envp);
+	i = 0;
+	while (ft_strncmp(envp[i], "PATH=", 5) != 0)
 		i++;
 	path = ft_split(&envp[i][5], ':');
+	if (path == NULL)
+		return (NULL);
 	i = 0;
 	while (path[i] != NULL)
 		i++;
 	path2 = malloc(sizeof(char *) * (i + 1));
+	if (path2 == NULL)
+		return (free_split(path));
 	path2[i] = NULL;
 	i -= 1;
 	while (i >= 0)
 	{
-		path2[i] = malloc(sizeof(char) * (ft_strlen(path[i]) + ft_strlen(argv[1]) + 3));
+		path2[i] = malloc(sizeof(char) * (ft_strlen(path[i]) + ft_strlen(arg[0]) + 3));
+		if (path2[i] == NULL)
+		{
+			free_split(path);
+			free_split(path2);
+			return (NULL);
+		}
 		path2[i][0] = '\0';
 		ft_strcat(path2[i], path[i]);
 		ft_strcat(path2[i], "/");
-		ft_strcat(path2[i], argv[1]);
+		ft_strcat(path2[i], arg[0]);
 		i--;
 	}
 	i = 0;
 	while (access(path2[i], F_OK|X_OK) == -1)
+	{
+		if (path2[i] == NULL)
+			return (0);
 		i++;
+	}
+	cmd = ft_strdup(path2[i]);
+	free_split(path);
+	free_split(path2);
+	return (cmd);
+}
+
+int	main(int argc, char **argv, char **envp)
+{
+	int	id;
+	int	id2;
+	char 	*cmd;
+	char	**arguments;
+
+	if (argc == 1)
+		return (0);
+	arguments = ft_split(argv[1], ' ');
+	if (arguments == NULL)
+		return (0);
+	cmd = get_path(arguments, envp);
+	if (cmd == NULL)
+	{
+		free_split(arguments);
+		return (0);
+	}
 	id = fork();
 	if (id == 0)
-		execve(path2[i], &argv[1], envp);
-	else
+		execve(cmd, arguments, envp);
+	wait(NULL);
+	free_split(arguments);
+	free(cmd);
+	arguments = ft_split(argv[2], ' ');
+	if (arguments == NULL)
+		return (0);
+	cmd = get_path(arguments, envp);
+	if (cmd == NULL)
 	{
-		wait(NULL);
-		i = 0;
-		while (path[i] != NULL)
-		{
-			free(path[i]);
-			free(path2[i]);
-			i++;
-		}
-		free(path);
-		free(path2);
+		free_split(arguments);
+		return (0);
 	}
+	if (id != 0)
+		id2 = fork();
+	if (id != 0 && id2 == 0)
+		execve(cmd, arguments, envp);
+	wait(NULL);
+	free_split(arguments);
+	free(cmd);
 	return (0);
 }
 
