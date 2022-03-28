@@ -7,7 +7,7 @@ NAME		= pipex
 
 SRCS_DIR	= srcs
 
-SRCS_NAME	= test.c			\
+SRCS_NAME	= main.c			\
 
 SRCS		= ${addprefix ${SRCS_DIR}/, ${SRCS_NAME}}
 
