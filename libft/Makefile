@@ -6,7 +6,7 @@
 #    By: fleitz <marvin@42.fr>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/11/23 10:17:02 by fleitz            #+#    #+#              #
-#    Updated: 2022/03/08 09:10:16 by fleitz           ###   ########.fr        #
+#    Updated: 2022/03/28 13:53:28 by fleitz           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,7 +44,7 @@ SRCS_STRINGS	= srcs_strings/ft_isalpha.c				\
 		  srcs_strings/ft_strchr.c				\
 		  srcs_strings/ft_strrchr.c				\
 		  srcs_strings/ft_strncmp.c				\
-		  srcs_strings/ft_strncmp.c				\
+		  srcs_strings/ft_strcmp.c				\
 		  srcs_strings/ft_memchr.c				\
 		  srcs_strings/ft_memcmp.c				\
 		  srcs_strings/ft_strnstr.c				\

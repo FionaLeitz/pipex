@@ -4,7 +4,7 @@
 #include "../libft/headers/libft.h"
 #include <sys/wait.h>
 
-// /dev/stdin pou /dev/stdout !!
+// /dev/stdin ou /dev/stdout !!
 
 char	*free_split(char **str)
 {
@@ -57,7 +57,6 @@ char	*get_path(char **arg, char **envp)
 		ft_strcat(path2[i], arg[0]);
 		i--;
 	}
-	ft_printf("LAAAAA !\n");
 	i = 0;
 	while (access(path2[i], F_OK|X_OK) == -1)
 	{
@@ -77,6 +76,11 @@ char	*get_file(char *filename, char **envp)
 	char	*path;
 	char	*file;
 
+	if (ft_strcmp(filename, "/dev/stdin") == 0)
+	{
+		file = ft_strdup(filename);
+		return (file);
+	}
 	i = 0;
 	while (ft_strncmp(envp[i], "PWD=", 4) != 0)
 		i++;
@@ -89,13 +93,13 @@ char	*get_file(char *filename, char **envp)
 	return (file);
 }
 
-void	make_arg(char **arg, char *file)
+char	**make_arg(char **arg, char *file)
 {
 	char	**cpy;
 	int		i;
 
 	if (arg == NULL)
-		return ;
+		return (NULL);
 	i = 0;
 	while (arg[i] != NULL)
 		i++;
@@ -107,47 +111,51 @@ void	make_arg(char **arg, char *file)
 		cpy[i] = ft_strdup(arg[i]);
 		i++;
 	}
-	cpy[i] = file;
+	if (ft_strcmp(file, "/dev/stdin") != 0)
+		cpy[i] = file;
+	else
+		cpy[i] = NULL;
 	free_split(arg);
-	arg = cpy;
-	i = 0;
-	while (arg[i] != NULL)
-	{
-		ft_printf("arg[%d] = %s\n", i, arg[i]);
-		i++;
-	}
-	return ;
+	return (cpy);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
 	int		id;
-	int		id2;
+//	int		id2;
 	char 	*cmd;
 	char	**arguments;
 	char	*file1;
 //	int		fd[2];
 
-	if (argc <= 3)
+	if (argc <= 2)
 		return (0);
 	file1 = get_file(argv[1], envp);
-	if (access(file1, F_OK) == -1)
+	if (access(file1, F_OK) == -1 && ft_strcmp(file1, "/dev/stdin") != 0)
 	{
 		ft_printf("No access\n");
 		return (0);
 	}
 	arguments = ft_split(argv[2], ' ');
-	make_arg(arguments, file1);
+	arguments = make_arg(arguments, file1);
 	if (arguments == NULL)
 		return (0);
 	cmd = get_path(arguments, envp);
-	return (0);
-	ft_printf("ici\n");
 	if (cmd == NULL)
 	{
 		free_split(arguments);
 		return (0);
 	}
+/*
+	int	i;
+	i = 0;
+	ft_printf("cmd = %s\n", cmd);
+	while (arguments[i])
+	{
+		ft_printf("arguments[%d] = %s\n", i, arguments[i]);
+		i++;
+	}
+*/
 	id = fork();
 	if (id == 0)
 		execve(cmd, arguments, envp);
@@ -165,9 +173,9 @@ int	main(int argc, char **argv, char **envp)
 	}
 	if (id != 0 && argc > 2)
 		id2 = fork();*/
-	if (id != 0 && id2 == 0)
-		execve(cmd, arguments, envp);
-	wait(NULL);
+//	if (id != 0/* && id2 == 0*/)
+//		execve(cmd, arguments, envp);
+//	wait(NULL);
 //	free_split(arguments);
 //	free(cmd);
 	return (0);
