@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <stdio.h>
+#include <fcntl.h>
 #include "../libft/headers/ft_printf.h"
 #include "../libft/headers/libft.h"
 #include <sys/wait.h>
@@ -81,6 +82,11 @@ char	*get_file(char *filename, char **envp)
 		file = ft_strdup(filename);
 		return (file);
 	}
+	else if (ft_strcmp(filename, "/dev/stdout") == 0)
+	{
+		file = ft_strdup(filename);
+		return (file);
+	}
 	i = 0;
 	while (ft_strncmp(envp[i], "PWD=", 4) != 0)
 		i++;
@@ -111,7 +117,7 @@ char	**make_arg(char **arg, char *file)
 		cpy[i] = ft_strdup(arg[i]);
 		i++;
 	}
-	if (ft_strcmp(file, "/dev/stdin") != 0)
+	if (!(ft_strcmp(file, "/dev/stdin") == 0 || ft_strcmp(file, "/dev/stdout") == 0))
 		cpy[i] = file;
 	else
 		cpy[i] = NULL;
@@ -119,19 +125,31 @@ char	**make_arg(char **arg, char *file)
 	return (cpy);
 }
 
+/* ce que j'ai a faire.
++ creer un fichier pour stocker les donnees de la premiere commande.
+	creer un char *
+	foutre le path dedans
+	rajouter un nom pour ce fichier
++ transmettre ce fichier pour la commande numero 2.
+	le fichier doit etre en read et en write
++ verifier que la fonction unlink peut supprimer ce fichier.
+*/
+
 int	main(int argc, char **argv, char **envp)
 {
 	int		id;
-//	int		id2;
+	int		id2;
 	char 	*cmd;
 	char	**arguments;
 	char	*file1;
-//	int		fd[2];
+	int		fd[2];
+	int		fd1;
+	int		fd2;
 
 	if (argc <= 2)
 		return (0);
 	file1 = get_file(argv[1], envp);
-	if (access(file1, F_OK) == -1 && ft_strcmp(file1, "/dev/stdin") != 0)
+	if (access(file1, F_OK|R_OK) == -1)
 	{
 		ft_printf("No access\n");
 		return (0);
@@ -146,23 +164,25 @@ int	main(int argc, char **argv, char **envp)
 		free_split(arguments);
 		return (0);
 	}
-/*
-	int	i;
-	i = 0;
-	ft_printf("cmd = %s\n", cmd);
-	while (arguments[i])
-	{
-		ft_printf("arguments[%d] = %s\n", i, arguments[i]);
-		i++;
-	}
-*/
+
+
 	id = fork();
 	if (id == 0)
 		execve(cmd, arguments, envp);
 	wait(NULL);
 	free_split(arguments);
 	free(cmd);
-	/*arguments = ft_split(argv[2], ' ');
+
+
+	file1 = get_file(argv[4], envp);
+	fd2 = open(file1, O_CREAT|O_WRONLY);
+	if (fd1 < 0)
+	{
+		ft_printf("No access\n");
+		return (0);
+	}
+	arguments = ft_split(argv[3], ' ');
+	arguments = make_arg(arguments, file1);
 	if (arguments == NULL)
 		return (0);
 	cmd = get_path(arguments, envp);
@@ -171,13 +191,24 @@ int	main(int argc, char **argv, char **envp)
 		free_split(arguments);
 		return (0);
 	}
+	if (pipe(fd) == -1)
+	{
+		ft_printf("Error pipe\n");
+		return (0);
+	}
 	if (id != 0 && argc > 2)
-		id2 = fork();*/
-//	if (id != 0/* && id2 == 0*/)
-//		execve(cmd, arguments, envp);
-//	wait(NULL);
-//	free_split(arguments);
-//	free(cmd);
+	{
+		id2 = fork();
+	}
+	if (id != 0 && id2 == 0)
+	{
+		close(fd[1]);
+		dup2(0, fd2);
+		execve(cmd, arguments, envp);
+	}
+	wait(NULL);
+	free_split(arguments);
+	free(cmd);
 	return (0);
 }
 
