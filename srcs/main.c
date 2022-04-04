@@ -7,6 +7,7 @@
 
 // /dev/stdin ou /dev/stdout !!
 
+// used to free a char **
 char	*free_split(char **str)
 {
 	int	i;
@@ -21,6 +22,8 @@ char	*free_split(char **str)
 	return (NULL);
 }
 
+// used to get the path of a command if it exist
+// if not, return NULL
 char	*get_path(char **arg, char **envp)
 {
 	int	i;
@@ -71,6 +74,7 @@ char	*get_path(char **arg, char **envp)
 	return (cmd);
 }
 
+// used to get the path of a file
 char	*get_file(char *filename, char **envp)
 {
 	int	i;
@@ -99,6 +103,7 @@ char	*get_file(char *filename, char **envp)
 	return (file);
 }
 
+// used to create a char ** with the command and its arguments
 char	**make_arg(char **arg, char *file)
 {
 	char	**cpy;
@@ -141,10 +146,12 @@ int	main(int argc, char **argv, char **envp)
 	int		id2;
 	char 	*cmd;
 	char	**arguments;
+	char 	*cmd2;
+	char	**arguments2;
 	char	*file1;
+	char	*file2;
 	int		fd[2];
 	int		fd1;
-	int		fd2;
 
 	if (argc <= 2)
 		return (0);
@@ -165,48 +172,53 @@ int	main(int argc, char **argv, char **envp)
 		return (0);
 	}
 
+	file2 = get_file(argv[argc - 1], envp);
 
-	id = fork();
-	if (id == 0)
-		execve(cmd, arguments, envp);
-	wait(NULL);
-	free_split(arguments);
-	free(cmd);
+	if (access(file1, F_OK) != -1)
+		fd1 = open(file2, O_CREAT|O_WRONLY|O_RDONLY);
+	else
+		fd1 = open(file2, O_WRONLY|O_RDONLY);
+	ft_printf("fd1 = %d\n", fd1);
 
-
-	file1 = get_file(argv[4], envp);
-	fd2 = open(file1, O_CREAT|O_WRONLY);
-	if (fd1 < 0)
+	
+	arguments2 = ft_split(argv[3], ' ');
+	if (arguments2 == NULL)
+		return (0);
+	cmd2 = get_path(arguments2, envp);
+	if (cmd2 == NULL)
 	{
-		ft_printf("No access\n");
+		free_split(arguments2);
 		return (0);
 	}
-	arguments = ft_split(argv[3], ' ');
-	arguments = make_arg(arguments, file1);
-	if (arguments == NULL)
-		return (0);
-	cmd = get_path(arguments, envp);
-	if (cmd == NULL)
-	{
-		free_split(arguments);
-		return (0);
-	}
+
 	if (pipe(fd) == -1)
 	{
 		ft_printf("Error pipe\n");
+		free_split(arguments);
+		free(cmd);
 		return (0);
 	}
-	if (id != 0 && argc > 2)
-	{
+
+	id = fork();
+	if (id != 0)
 		id2 = fork();
-	}
-	if (id != 0 && id2 == 0)
+	if (id == 0)
 	{
-		close(fd[1]);
-		dup2(0, fd2);
+		close(fd[0]);
+		dup2(fd[1], 1);
 		execve(cmd, arguments, envp);
 	}
-	wait(NULL);
+	else if (id2 == 0)
+	{
+		dup2(fd[0], 0);
+		dup2(fd1, 1);
+		execve(cmd2, arguments2, envp);
+	}
+
+	waitpid(0, NULL, 0);
+	close(fd1);
+	free_split(arguments2);
+	free(cmd2);
 	free_split(arguments);
 	free(cmd);
 	return (0);
