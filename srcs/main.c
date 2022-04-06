@@ -31,7 +31,8 @@ char	*get_path(char **arg, char **envp)
 	char **path2;
 	char *cmd;
 
-	execve(arg[0], arg, envp);
+	if (access(arg[0], F_OK) != -1)
+		return (arg[0]);
 	i = 0;
 	while (ft_strncmp(envp[i], "PATH=", 5) != 0)
 		i++;
@@ -100,6 +101,7 @@ char	*get_file(char *filename, char **envp)
 	ft_strcat(file, path);
 	ft_strcat(file, "/");
 	ft_strcat(file, filename);
+	free(path);
 	return (file);
 }
 
@@ -131,14 +133,9 @@ char	**make_arg(char **arg, char *file)
 }
 
 /* ce que j'ai a faire.
-+ creer un fichier pour stocker les donnees de la premiere commande.
-	creer un char *
-	foutre le path dedans
-	rajouter un nom pour ce fichier
-+ transmettre ce fichier pour la commande numero 2.
-	le fichier doit etre en read et en write
-+ verifier que la fonction unlink peut supprimer ce fichier.
 */
+
+
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -174,12 +171,20 @@ int	main(int argc, char **argv, char **envp)
 
 	file2 = get_file(argv[argc - 1], envp);
 
-	if (access(file1, F_OK) != -1)
-		fd1 = open(file2, O_CREAT|O_WRONLY|O_RDONLY);
-	else
+//	if (access(file1, F_OK) != -1)
+	fd1 = open(file2, O_CREAT|O_RDWR);
+	if (fd1 == -1)
+	{
+		ft_printf("c'est la merde\n");
+		free_split(arguments);
+		free(cmd);
+		free(file2);
+		return (0);
+	}
+/*	else
+	{
 		fd1 = open(file2, O_WRONLY|O_RDONLY);
-	ft_printf("fd1 = %d\n", fd1);
-
+	}*/
 	
 	arguments2 = ft_split(argv[3], ' ');
 	if (arguments2 == NULL)
@@ -207,20 +212,26 @@ int	main(int argc, char **argv, char **envp)
 		close(fd[0]);
 		dup2(fd[1], 1);
 		execve(cmd, arguments, envp);
+		close(fd[1]);
 	}
 	else if (id2 == 0)
 	{
+		close(fd[1]);
 		dup2(fd[0], 0);
 		dup2(fd1, 1);
 		execve(cmd2, arguments2, envp);
+		close(fd[0]);
 	}
 
 	waitpid(0, NULL, 0);
+	close(fd[0]);
+	close(fd[1]);
 	close(fd1);
 	free_split(arguments2);
 	free(cmd2);
 	free_split(arguments);
 	free(cmd);
+	free(file2);
 	return (0);
 }
 
@@ -271,27 +282,5 @@ int	main(void)
 		ft_printf("i = %d\n", i);
 	}
 	return (1);
-}
-
-int	main(int argc, char **argv)
-{
-	(void)argc;
-	(void)argv;
-	int	id;
-	int	i;
-
-	i = 0;
-	while (i++ < 2)
-	{
-		id = fork();
-		if (id == 0)
-			break ;
-	}
-	if (id == 0)
-		ft_printf("Hello from fork !\n");
-	while (wait(NULL) != -1)
-		i++;
-	ft_printf("Hello !\n");
-	return (0);
 }
 */
