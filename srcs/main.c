@@ -45,7 +45,7 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_data	data;
 
-	if (argc <= 2)
+	if (argc <= 4)
 		return (0);
 	if (file1(&data, argv, envp) == 0)
 		return (0);

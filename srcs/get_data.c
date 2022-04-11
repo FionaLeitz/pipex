@@ -36,7 +36,10 @@ int	get_path2(int i, char **path, char **path2, char *arg)
 	while (access(path2[++i], F_OK | X_OK) == -1)
 	{
 		if (path2[i] == NULL)
+		{
+			ft_printf("zsh: command not found: %s\n", arg);
 			return (-1);
+		}
 	}
 	free_char_tab(path);
 	return (i);
@@ -104,20 +107,27 @@ int	file1(t_data *data, char **argv, char **envp)
 {
 	data->file1 = get_file(argv[1], envp);
 	if (access(data->file1, F_OK | R_OK) == -1)
+	{
+		ft_printf("zsh: %c%s: %s\n", ft_tolower(strerror(errno)[0]),
+			&strerror(errno)[1], argv[1]);
 		return (0);
+	}
 	data->fd2 = open(data->file1, O_RDONLY);
-	if (data->fd2 == -1)
-		return (0);
 	data->arg1 = ft_split(argv[2], ' ');
 	if (data->arg1 == NULL)
 		return (0);
 	data->cmd1 = get_path(data->arg1, envp);
 	if (data->cmd1 == NULL)
+	{
 		free_char_tab(data->arg1);
+		return (0);
+	}
 	data->file2 = get_file(argv[4], envp);
 	data->fd1 = open(data->file2, O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (data->fd1 == -1)
 	{
+		ft_printf("zsh: %c%s: %s\n", ft_tolower(strerror(errno)[0]),
+			&strerror(errno)[1], argv[4]);
 		free_char_tab(data->arg1);
 		free(data->cmd1);
 		free(data->file2);
@@ -140,7 +150,6 @@ int	file2(t_data *data, char **argv, char **envp)
 	}
 	if (pipe(data->fd) == -1)
 	{
-		ft_printf("Error pipe\n");
 		free_char_tab(data->arg1);
 		free(data->cmd1);
 		return (0);

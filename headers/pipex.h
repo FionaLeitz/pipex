@@ -13,12 +13,14 @@
 #ifndef PIPEX_H
 # define PIPEX_H
 
-#include <unistd.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <sys/wait.h>
-#include "../libft/headers/ft_printf.h"
-#include "../libft/headers/libft.h"
+# include <unistd.h>
+# include <stdio.h>
+# include <fcntl.h>
+# include <sys/wait.h>
+# include <string.h>
+# include <errno.h>
+# include "../libft/headers/ft_printf.h"
+# include "../libft/headers/libft.h"
 
 typedef	struct	s_data
 {
