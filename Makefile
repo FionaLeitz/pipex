@@ -20,6 +20,8 @@ NAME		= pipex
 SRCS_DIR	= srcs
 
 SRCS_NAME	= main.c			\
+			end.c				\
+			get_data.c			\
 
 SRCS		= ${addprefix ${SRCS_DIR}/, ${SRCS_NAME}}
 
