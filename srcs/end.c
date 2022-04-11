@@ -12,18 +12,39 @@
 
 #include "../headers/pipex.h"
 
-// close and free in the end
-void	end(t_data *data)
+// strcat
+void	ft_strcat2(char *dest, char *str, char *str2)
+{
+	dest[0] = '\0';
+	ft_strcat(dest, str);
+	ft_strcat(dest, "/");
+	ft_strcat(dest, str2);
+}
+
+// close fd
+void	ft_close(t_data *data)
 {
 	close(data->fd[0]);
 	close(data->fd[1]);
 	close(data->fd1);
 	close(data->fd2);
-	free_char_tab(data->arg2);
-	free(data->cmd2);
-	free_char_tab(data->arg1);
-	free(data->cmd1);
-	free(data->file2);
+}
+
+// close and free in the end
+void	end(t_data *data)
+{	
+	if (data->arg1 != NULL)
+		free_char_tab(data->arg1);
+	if (data->arg2 != NULL)
+		free_char_tab(data->arg2);
+	if (data->cmd1 != NULL)
+		free(data->cmd1);
+	if (data->cmd2 != NULL)
+		free(data->cmd2);
+	if (data->file1 != NULL)
+		free(data->file1);
+	if (data->file2 != NULL)
+		free(data->file2);
 }
 
 // used to free a char **

@@ -47,11 +47,24 @@ int	main(int argc, char **argv, char **envp)
 
 	if (argc <= 4)
 		return (0);
+	data.cmd1 = NULL;
+	data.cmd2 = NULL;
+	data.arg1 = NULL;
+	data.arg2 = NULL;
+	data.file1 = NULL;
+	data.file2 = NULL;
 	if (file1(&data, argv, envp) == 0)
+	{
+		end(&data);
 		return (0);
+	}
 	if (file2(&data, argv, envp) == 0)
+	{
+		end(&data);
 		return (0);
+	}
 	children(&data, envp);
 	end(&data);
+	ft_close(&data);
 	return (0);
 }

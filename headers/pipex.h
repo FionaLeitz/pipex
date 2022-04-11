@@ -45,6 +45,8 @@ char	*get_file(char *filename, char **envp);
 int		file1(t_data *data, char **argv, char **envp);
 int		file2(t_data *data, char **argv, char **envp);
 // end.c
+void	ft_strcat2(char *dest, char *str, char *str2);
+void	ft_close(t_data *data);
 void	end(t_data *data);
 char	*free_char_tab(char **str);
 
