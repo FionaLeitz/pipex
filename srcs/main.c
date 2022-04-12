@@ -45,7 +45,7 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_data	data;
 
-	if (argc <= 4)
+	if (argc != 5)
 		return (0);
 	data.cmd1 = NULL;
 	data.cmd2 = NULL;
