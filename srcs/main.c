@@ -6,11 +6,34 @@
 /*   By: fleitz <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/11 13:25:16 by fleitz            #+#    #+#             */
-/*   Updated: 2022/04/11 13:25:36 by fleitz           ###   ########.fr       */
+/*   Updated: 2022/04/12 12:13:16 by fleitz           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../headers/pipex.h"
+
+// used to get the path of a file
+char	*get_file(char *filename, char **envp)
+{
+	int		i;
+	char	*path;
+	char	*file;
+
+	if ((ft_strcmp(filename, "/dev/stdin") == 0)
+		|| (ft_strcmp(filename, "/dev/stdout") == 0))
+	{
+		file = ft_strdup(filename);
+		return (file);
+	}
+	i = 0;
+	while (ft_strncmp(envp[i], "PWD=", 4) != 0)
+		i++;
+	path = ft_strdup(&envp[i][4]);
+	file = malloc(sizeof(char) * (ft_strlen(path) + ft_strlen(filename) + 2));
+	ft_strcat2(file, path, filename);
+	free(path);
+	return (file);
+}
 
 // do the forks
 void	children(t_data *data, char **envp)

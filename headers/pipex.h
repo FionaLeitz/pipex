@@ -6,7 +6,7 @@
 /*   By: fleitz <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/11 13:27:27 by fleitz            #+#    #+#             */
-/*   Updated: 2022/04/11 13:27:30 by fleitz           ###   ########.fr       */
+/*   Updated: 2022/04/12 15:46:04 by fleitz           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,26 +22,27 @@
 # include "../libft/headers/ft_printf.h"
 # include "../libft/headers/libft.h"
 
-typedef	struct	s_data
+typedef struct s_data
 {
-		char	*cmd1;
-		char	*cmd2;
-		char	**arg1;
-		char	**arg2;
-		char	*file1;
-		char	*file2;
-		int		fd1;
-		int		fd2;
-		int		fd[2];
-}				t_data;
+	char	*cmd1;
+	char	*cmd2;
+	char	**arg1;
+	char	**arg2;
+	char	*file1;
+	char	*file2;
+	int		fd1;
+	int		fd2;
+	int		fd[2];
+}			t_data;
 
 // main.c
+char	*get_file(char *filename, char **envp);
 void	children(t_data *data, char **envp);
 int		main(int argc, char **argv, char **envp);
 // get_data.c
 char	*get_path(char **arg, char **envp);
+char	*path_cmd(char **envp, char **arg);
 int		get_path2(int i, char **path, char **path2, char *arg);
-char	*get_file(char *filename, char **envp);
 int		file1(t_data *data, char **argv, char **envp);
 int		file2(t_data *data, char **argv, char **envp);
 // end.c

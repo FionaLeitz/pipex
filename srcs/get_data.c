@@ -42,17 +42,13 @@ int	get_path2(int i, char **path, char **path2, char *arg)
 	return (i);
 }
 
-// used to get the path of a command if it exist
-// if not, return NULL
-char	*get_path(char **arg, char **envp)
+char	*path_cmd(char **envp, char **arg)
 {
 	int		i;
 	char	**path;
 	char	**path2;
 	char	*cmd;
 
-	if (access(arg[0], F_OK) != -1)
-		return (ft_strdup(arg[0]));
 	i = 0;
 	while (ft_strncmp(envp[i], "PATH=", 5) != 0)
 		i++;
@@ -73,27 +69,21 @@ char	*get_path(char **arg, char **envp)
 	return (cmd);
 }
 
-// used to get the path of a file
-char	*get_file(char *filename, char **envp)
+// used to get the path of a command if it exist
+// if not, return NULL
+char	*get_path(char **arg, char **envp)
 {
-	int		i;
-	char	*path;
-	char	*file;
+	char	*cmd;
 
-	if ((ft_strcmp(filename, "/dev/stdin") == 0)
-		|| (ft_strcmp(filename, "/dev/stdout") == 0))
+	if (arg[0] == NULL)
 	{
-		file = ft_strdup(filename);
-		return (file);
+		ft_printf("zsh: permission denied:\n");
+		return (NULL);
 	}
-	i = 0;
-	while (ft_strncmp(envp[i], "PWD=", 4) != 0)
-		i++;
-	path = ft_strdup(&envp[i][4]);
-	file = malloc(sizeof(char) * (ft_strlen(path) + ft_strlen(filename) + 2));
-	ft_strcat2(file, path, filename);
-	free(path);
-	return (file);
+	if (access(arg[0], F_OK) != -1)
+		return (ft_strdup(arg[0]));
+	cmd = path_cmd(envp, arg);
+	return (cmd);
 }
 
 // used to get the datas for the first file
@@ -104,10 +94,16 @@ int	file1(t_data *data, char **argv, char **envp)
 	{
 		ft_printf("zsh: %c%s: %s\n", ft_tolower(strerror(errno)[0]),
 			&strerror(errno)[1], argv[1]);
+		data->fd2 = 0;
 	}
-	data->fd2 = open(data->file1, O_RDONLY);
-	data->arg1 = ft_split(argv[2], ' ');
-	data->cmd1 = get_path(data->arg1, envp);
+	else
+	{
+		data->fd2 = open(data->file1, O_RDONLY);
+		data->arg1 = ft_split(argv[2], ' ');
+		data->cmd1 = get_path(data->arg1, envp);
+	}
+	if (data->cmd1 == NULL)
+		data->cmd1 = ft_strdup(argv[2]);
 	data->file2 = get_file(argv[4], envp);
 	data->fd1 = open(data->file2, O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (data->fd1 == -1)
