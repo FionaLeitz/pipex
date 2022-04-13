@@ -26,8 +26,10 @@ char	*get_file(char *filename, char **envp)
 		return (file);
 	}
 	i = 0;
-	while (ft_strncmp(envp[i], "PWD=", 4) != 0)
+	while (envp[i] != NULL && (ft_strncmp(envp[i], "PWD=", 4) != 0))
 		i++;
+	if (i == 0)
+		return (NULL);
 	path = ft_strdup(&envp[i][4]);
 	file = malloc(sizeof(char) * (ft_strlen(path) + ft_strlen(filename) + 2));
 	ft_strcat2(file, path, filename);

@@ -50,8 +50,14 @@ char	*path_cmd(char **envp, char **arg)
 	char	*cmd;
 
 	i = 0;
-	while (ft_strncmp(envp[i], "PATH=", 5) != 0)
+	while (envp[i] != NULL && ft_strncmp(envp[i], "PATH=", 5) != 0)
 		i++;
+	if (i == 0)
+	{
+		if (access(arg[0], F_OK | X_OK) == -1)
+			ft_printf("zsh: command not found: %s\n", arg[0]);
+		return (ft_strdup(arg[0]));
+	}
 	path = ft_split(&envp[i][5], ':');
 	if (path == NULL)
 		return (NULL);
@@ -89,7 +95,8 @@ char	*get_path(char **arg, char **envp)
 // used to get the datas for the first file
 int	file1(t_data *data, char **argv, char **envp)
 {
-	data->file1 = get_file(argv[1], envp);
+//	data->file1 = get_file(argv[1], envp);
+	data->file1 = ft_strdup(argv[1]);
 	if (access(data->file1, F_OK | R_OK) == -1)
 	{
 		ft_printf("zsh: %c%s: %s\n", ft_tolower(strerror(errno)[0]),
@@ -101,10 +108,12 @@ int	file1(t_data *data, char **argv, char **envp)
 		data->fd2 = open(data->file1, O_RDONLY);
 		data->arg1 = ft_split(argv[2], ' ');
 		data->cmd1 = get_path(data->arg1, envp);
+		if (data->cmd1 == NULL)
+			data->cmd1 = ft_strdup(data->arg1[0]);
 	}
-	if (data->cmd1 == NULL)
-		data->cmd1 = ft_strdup(argv[2]);
-	data->file2 = get_file(argv[4], envp);
+//	ft_printf("command 1 = %s\n", data->cmd1);
+	data->file2 = ft_strdup(argv[4]);
+//	data->file2 = get_file(argv[4], envp);
 	data->fd1 = open(data->file2, O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (data->fd1 == -1)
 	{
@@ -124,6 +133,7 @@ int	file2(t_data *data, char **argv, char **envp)
 	data->cmd2 = get_path(data->arg2, envp);
 	if (data->cmd2 == NULL)
 		return (0);
+//	ft_printf("command 2 = %s\n", data->cmd2);
 	if (pipe(data->fd) == -1)
 		return (0);
 	return (1);
