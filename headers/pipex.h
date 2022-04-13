@@ -36,7 +36,6 @@ typedef struct s_data
 }			t_data;
 
 // main.c
-char	*get_file(char *filename, char **envp);
 void	children(t_data *data, char **envp);
 int		main(int argc, char **argv, char **envp);
 // get_data.c

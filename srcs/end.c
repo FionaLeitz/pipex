@@ -24,10 +24,14 @@ void	ft_strcat2(char *dest, char *str, char *str2)
 // close fd
 void	ft_close(t_data *data)
 {
-	close(data->fd[0]);
-	close(data->fd[1]);
-	close(data->fd1);
-	close(data->fd2);
+	if (data->fd2 != -1)
+		close(data->fd[0]);
+	if (data->fd2 != -1)
+		close(data->fd[1]);
+	if (data->fd2 != -1)
+		close(data->fd1);
+	if (data->fd2 != -1)
+		close(data->fd2);
 }
 
 // close and free in the end
