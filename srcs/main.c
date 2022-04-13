@@ -12,6 +12,36 @@
 
 #include "../headers/pipex.h"
 
+// get path for the command
+char	*path_cmd(char **envp, char **arg)
+{
+	int		i;
+	char	**path;
+	char	**path2;
+	char	*cmd;
+
+	i = 0;
+	while (envp[i] != NULL && ft_strncmp(envp[i], "PATH=", 5) != 0)
+		i++;
+	if (check_cmd(i, arg[0], envp) == 0)
+		return (ft_strdup(arg[0]));
+	path = ft_split(&envp[i][5], ':');
+	if (path == NULL)
+		return (NULL);
+	i = 0;
+	while (path[i] != NULL)
+		i++;
+	path2 = malloc(sizeof(char *) * (i + 1));
+	if (path2 == NULL)
+		return (free_char_tab(path));
+	i = get_path2(i, path, path2, arg[0]);
+	if (i == -1)
+		return (free_char_tab(path2));
+	cmd = ft_strdup(path2[i]);
+	free_char_tab(path2);
+	return (cmd);
+}
+
 // do the forks
 void	children(t_data *data, char **envp)
 {

@@ -36,12 +36,11 @@ typedef struct s_data
 }			t_data;
 
 // main.c
-void	children(t_data *data, char **envp);
+char	*path_cmd(char **envp, char **arg);
 int		main(int argc, char **argv, char **envp);
 // get_data.c
-char	*get_path(char **arg, char **envp);
-char	*path_cmd(char **envp, char **arg);
 int		get_path2(int i, char **path, char **path2, char *arg);
+int		check_cmd(int i, char *arg, char **envp);
 int		file1(t_data *data, char **argv, char **envp);
 int		file2(t_data *data, char **argv, char **envp);
 // end.c

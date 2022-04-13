@@ -42,6 +42,7 @@ int	get_path2(int i, char **path, char **path2, char *arg)
 	return (i);
 }
 
+// check if command exist if no env
 int	check_cmd(int i, char *arg, char **envp)
 {
 	if (envp[i] == NULL)
@@ -51,35 +52,6 @@ int	check_cmd(int i, char *arg, char **envp)
 		return (0);
 	}
 	return (1);
-}
-
-char	*path_cmd(char **envp, char **arg)
-{
-	int		i;
-	char	**path;
-	char	**path2;
-	char	*cmd;
-
-	i = 0;
-	while (envp[i] != NULL && ft_strncmp(envp[i], "PATH=", 5) != 0)
-		i++;
-	if (check_cmd(i, arg[0], envp) == 0)
-		return (ft_strdup(arg[0]));
-	path = ft_split(&envp[i][5], ':');
-	if (path == NULL)
-		return (NULL);
-	i = 0;
-	while (path[i] != NULL)
-		i++;
-	path2 = malloc(sizeof(char *) * (i + 1));
-	if (path2 == NULL)
-		return (free_char_tab(path));
-	i = get_path2(i, path, path2, arg[0]);
-	if (i == -1)
-		return (free_char_tab(path2));
-	cmd = ft_strdup(path2[i]);
-	free_char_tab(path2);
-	return (cmd);
 }
 
 // used to get the path of a command if it exist
@@ -108,19 +80,13 @@ int	file1(t_data *data, char **argv, char **envp)
 		ft_printf("zsh: %c%s: %s\n", ft_tolower(strerror(errno)[0]),
 			&strerror(errno)[1], argv[1]);
 		data->fd2 = -1;
-		data->arg1 = ft_split(argv[2], ' ');
-		data->cmd1 = get_path(data->arg1, envp);
-		if (data->cmd1 == NULL)
-			data->cmd1 = ft_strdup(data->arg1[0]);
 	}
 	else
-	{
 		data->fd2 = open(data->file1, O_RDONLY);
-		data->arg1 = ft_split(argv[2], ' ');
-		data->cmd1 = get_path(data->arg1, envp);
-		if (data->cmd1 == NULL)
-			data->cmd1 = ft_strdup(data->arg1[0]);
-	}
+	data->arg1 = ft_split(argv[2], ' ');
+	data->cmd1 = get_path(data->arg1, envp);
+	if (data->cmd1 == NULL)
+		data->cmd1 = ft_strdup(data->arg1[0]);
 	data->file2 = ft_strdup(argv[4]);
 	data->fd1 = open(data->file2, O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (data->fd1 == -1)
