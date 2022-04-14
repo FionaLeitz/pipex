@@ -62,9 +62,10 @@ void	children(t_data *data, char **envp)
 			close(data->fd2);
 		}
 		close(data->fd[1]);
-/*		write(2, "zsh: command not found: ", 25);
+		write(2, "zsh: command not found: ", 25);
 		write(2, data->cmd1, ft_strlen(data->cmd1));
-		write(2, "\n", 1);*/
+		write(2, "\n", 1);
+		return ;
 	}
 	if (id != 0 && id2 == 0)
 	{
@@ -75,9 +76,10 @@ void	children(t_data *data, char **envp)
 		close(data->fd[0]);
 		close(data->fd1);
 		close(data->fd2);
-/*		write(2, "zsh: command not found: ", 25);
+		write(2, "zsh: command not found: ", 25);
 		write(2, data->cmd2, ft_strlen(data->cmd2));
-		write(2, "\n", 1);*/
+		write(2, "\n", 1);
+		return ;
 	}
 	close(data->fd[0]);
 	close(data->fd[1]);
