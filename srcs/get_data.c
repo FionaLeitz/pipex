@@ -63,7 +63,7 @@ char	*get_path(char **arg, char **envp)
 	if (arg[0] == NULL)
 	{
 		ft_printf("zsh: permission denied:\n");
-		return (ft_strdup("1"));
+		return (NULL);
 	}
 	if (access(arg[0], F_OK | X_OK) != -1)
 		return (ft_strdup(arg[0]));
@@ -75,19 +75,20 @@ char	*get_path(char **arg, char **envp)
 int	file1(t_data *data, char **argv, char **envp)
 {
 	data->file1 = ft_strdup(argv[1]);
+	data->fd2 = -1;
 	if (access(data->file1, F_OK | R_OK) == -1)
-	{
 		ft_printf("zsh: %c%s: %s\n", ft_tolower(strerror(errno)[0]),
 			&strerror(errno)[1], argv[1]);
-		data->fd2 = -1;
-	}
 	else
 		data->fd2 = open(data->file1, O_RDONLY);
 	data->arg1 = ft_split(argv[2], ' ');
 	data->cmd1 = get_path(data->arg1, envp);
-
 	if (data->cmd1 == NULL)
+	{
 		data->cmd1 = ft_strdup(data->arg1[0]);
+		close(data->fd2);
+		data->fd2 = -1;
+	}
 	data->file2 = ft_strdup(argv[4]);
 	data->fd1 = open(data->file2, O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (data->fd1 == -1)

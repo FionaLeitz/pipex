@@ -42,6 +42,29 @@ char	*path_cmd(char **envp, char **arg)
 	return (cmd);
 }
 
+void	children2(t_data *data, char **envp, int id, int id2)
+{
+	if (id != 0 && id2 == 0)
+	{
+		close(data->fd[1]);
+		dup2(data->fd[0], 0);
+		dup2(data->fd1, 1);
+		execve(data->cmd2, data->arg2, envp);
+		close(data->fd[0]);
+		close(data->fd1);
+		if (data->fd2 != -1)
+			close(data->fd2);
+		write(2, "zsh: command not found: ", 25);
+		write(2, data->cmd2, ft_strlen(data->cmd2));
+		write(2, "\n", 1);
+		return ;
+	}
+	close(data->fd[0]);
+	close(data->fd[1]);
+	waitpid(id, NULL, 0);
+	waitpid(id2, NULL, 0);
+}
+
 // do the forks
 void	children(t_data *data, char **envp)
 {
@@ -60,31 +83,14 @@ void	children(t_data *data, char **envp)
 		{
 			execve(data->cmd1, data->arg1, envp);
 			close(data->fd2);
+			write(2, "zsh: command not found: ", 25);
+			write(2, data->cmd1, ft_strlen(data->cmd1));
+			write(2, "\n", 1);
 		}
 		close(data->fd[1]);
-		write(2, "zsh: command not found: ", 25);
-		write(2, data->cmd1, ft_strlen(data->cmd1));
-		write(2, "\n", 1);
 		return ;
 	}
-	if (id != 0 && id2 == 0)
-	{
-		close(data->fd[1]);
-		dup2(data->fd[0], 0);
-		dup2(data->fd1, 1);
-		execve(data->cmd2, data->arg2, envp);
-		close(data->fd[0]);
-		close(data->fd1);
-		close(data->fd2);
-		write(2, "zsh: command not found: ", 25);
-		write(2, data->cmd2, ft_strlen(data->cmd2));
-		write(2, "\n", 1);
-		return ;
-	}
-	close(data->fd[0]);
-	close(data->fd[1]);
-	waitpid(id, NULL, 0);
-	waitpid(id2, NULL, 0);
+	children2(data, envp, id, id2);
 }
 
 // main
