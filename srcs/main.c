@@ -51,7 +51,8 @@ void	children2(t_data *data, char **envp, int id, int id2)
 		dup2(data->fd1, 1);
 		execve(data->cmd2, data->arg2, envp);
 		close(data->fd[0]);
-		close(data->fd1);
+		if (data->fd1 != -1)
+			close(data->fd1);
 		if (data->fd2 != -1)
 			close(data->fd2);
 		write(2, "zsh: command not found: ", 25);

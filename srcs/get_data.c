@@ -36,7 +36,7 @@ int	get_path2(int i, char **path, char **path2, char *arg)
 	free_char_tab(path);
 	if (path2[i] == NULL)
 	{
-		ft_printf("zsh: command not found: %s\n", arg);
+		ft_printf("3zsh: command not found: %s\n", arg);
 		return (-1);
 	}
 	return (i);
@@ -82,7 +82,8 @@ int	file1(t_data *data, char **argv, char **envp)
 	else
 		data->fd2 = open(data->file1, O_RDONLY);
 	data->arg1 = ft_split(argv[2], ' ');
-	data->cmd1 = get_path(data->arg1, envp);
+	if (data->fd2 != -1)
+		data->cmd1 = get_path(data->arg1, envp);
 	if (data->cmd1 == NULL)
 	{
 		data->cmd1 = ft_strdup(data->arg1[0]);
