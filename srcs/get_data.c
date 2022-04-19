@@ -36,7 +36,7 @@ int	get_path2(int i, char **path, char **path2, char *arg)
 	free_char_tab(path);
 	if (path2[i] == NULL)
 	{
-		ft_printf("zsh: command not found: %s\n", arg);
+		ft_printf("command not found: %s\n", arg);
 		return (-1);
 	}
 	return (i);
@@ -48,7 +48,7 @@ int	check_cmd(int i, char *arg, char **envp)
 	if (envp[i] == NULL)
 	{
 		if (access(arg, F_OK | X_OK) == -1)
-			ft_printf("zsh: command not found: %s\n", arg);
+			ft_printf("command not found: %s\n", arg);
 		return (0);
 	}
 	return (1);
@@ -56,19 +56,22 @@ int	check_cmd(int i, char *arg, char **envp)
 
 // used to get the path of a command if it exist
 // if not, return NULL
-char	*get_path(char **arg, char **envp)
+char	*get_path(char **arg, char *cmd, char **envp)
 {
-	char	*cmd;
+	char	*new_cmd;
 
 	if (arg[0] == NULL)
 	{
-		ft_printf("zsh: permission denied:\n");
+		if (cmd[0] == ' ')
+			ft_printf("command not found: %s\n", cmd);
+		else
+			ft_printf("permission denied:\n");
 		return (NULL);
 	}
 	if (access(arg[0], F_OK | X_OK) != -1)
 		return (ft_strdup(arg[0]));
-	cmd = path_cmd(envp, arg);
-	return (cmd);
+	new_cmd = path_cmd(envp, arg);
+	return (new_cmd);
 }
 
 // used to get the datas for the first file
@@ -77,24 +80,20 @@ int	file1(t_data *data, char **argv, char **envp)
 	data->file1 = ft_strdup(argv[1]);
 	data->fd2 = -1;
 	if (access(data->file1, F_OK | R_OK) == -1)
-		ft_printf("zsh: %c%s: %s\n", ft_tolower(strerror(errno)[0]),
+		ft_printf("%c%s: %s\n", ft_tolower(strerror(errno)[0]),
 			&strerror(errno)[1], argv[1]);
 	else
 		data->fd2 = open(data->file1, O_RDONLY);
 	data->arg1 = ft_split(argv[2], ' ');
 	if (data->fd2 != -1)
-		data->cmd1 = get_path(data->arg1, envp);
+		data->cmd1 = get_path(data->arg1, argv[2], envp);
 	if (data->cmd1 == NULL)
-	{
-		data->cmd1 = ft_strdup(data->arg1[0]);
-		close(data->fd2);
-		data->fd2 = -1;
-	}
+		cpy_arg(data);
 	data->file2 = ft_strdup(argv[4]);
 	data->fd1 = open(data->file2, O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (data->fd1 == -1)
 	{
-		ft_printf("zsh: %c%s: %s\n", ft_tolower(strerror(errno)[0]),
+		ft_printf("%c%s: %s\n", ft_tolower(strerror(errno)[0]),
 			&strerror(errno)[1], argv[4]);
 		return (0);
 	}
@@ -116,7 +115,7 @@ int	file2(t_data *data, char **argv, char **envp)
 		data->arg2[1] = NULL;
 		data->arg2[0] = ft_strdup(argv[3]);
 	}
-	data->cmd2 = get_path(data->arg2, envp);
+	data->cmd2 = get_path(data->arg2, argv[3], envp);
 	if (data->cmd2 == NULL)
 		return (0);
 	if (pipe(data->fd) == -1)

@@ -36,6 +36,7 @@ typedef struct s_data
 }			t_data;
 
 // main.c
+void	cpy_arg(t_data *data);
 char	*path_cmd(char **envp, char **arg);
 int		main(int argc, char **argv, char **envp);
 // get_data.c
